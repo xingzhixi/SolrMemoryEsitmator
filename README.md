@@ -1,0 +1,4 @@
+SolrMemoryEsitmator
+===================
+
+Solr memory estimator
