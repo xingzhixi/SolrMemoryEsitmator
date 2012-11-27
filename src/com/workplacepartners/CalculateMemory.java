@@ -18,6 +18,8 @@ package com.workplacepartners;
 import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 public class CalculateMemory {
@@ -30,6 +32,7 @@ public class CalculateMemory {
   static long calculate(EstProperties estProps, boolean dump) {
     BufferedWriter writer = null;
     long total = 0;
+    _fields.clear();
     try {
       if (dump) {
         writer = new BufferedWriter(new FileWriter("estimate.txt"));
@@ -109,7 +112,6 @@ public class CalculateMemory {
             total += prop.get_uniqueVals() * 4;
             dumpNum(writer, String.format("  Faceting requirements (uniqueVals * sizeof(int) (%s * 4):",
                 Utils._decimalFormat.format(prop.get_uniqueVals())), prop.get_uniqueVals() * 4);
-
           }
         }
 
@@ -185,7 +187,9 @@ public class CalculateMemory {
         writer.newLine();
         writer.write("-------------Total-------------------------------------");
         writer.newLine();
+        writer.newLine();
         dumpNum(writer, "TOTAL (MB): ", total / (1024 * 1024));
+        dumpFields(writer);
         writer.close();
       }
     } catch (Exception e) {
@@ -226,10 +230,54 @@ public class CalculateMemory {
     dumpNum(writer, "  Raw (stored) bytes: ", prop.get_rawBytes());
     writer.write("   ------");
     writer.newLine();
+    addFieldDef(prop);
+
   }
 
   static void dumpBool(BufferedWriter writer, String tag, boolean val) throws IOException {
     writer.write(tag + ((val) ? "true" : "false"));
     writer.newLine();
   }
+
+  static List<String> _fields = new ArrayList<String>();
+
+  static void addFieldDef(FieldProperty prop) {
+    //<field name="weight" type="float" indexed="true" stored="true"/>
+    StringBuilder sb = new StringBuilder("<field name=\"");
+    sb.append(prop.get_name()).append("\" ");
+    if (prop.is_string()) {
+      sb.append("type=\"string\" ");
+    } else {
+      sb.append("type=\"").append(prop.get_fieldType()).append("\" ");
+    }
+    if (!prop.is_boosting() && !prop.is_lengthNorms()) {
+      sb.append("omitNorms=\"true\" ");
+    } else {
+      sb.append("omitNorms=\"false\" ");
+    }
+    if (prop.get_rawBytes() > 0) {
+      sb.append("stored=\"true\" ");
+    } else {
+      sb.append("stored=\"true\" ");
+    }
+
+    sb.append("indexed=\"true\" ");
+
+    //TODO: omittermfreqs and all that stuff?
+    sb.append(" />");
+    _fields.add(sb.toString());
+  }
+
+  static void dumpFields(BufferedWriter writer) throws IOException {
+    writer.newLine();
+    writer.newLine();
+    writer.write("----------------field definitions, MAY BE INCOMPLETE!-------");
+    writer.newLine();
+    writer.newLine();
+    for (String s : _fields) {
+      writer.write(s);
+      writer.newLine();
+    }
+  }
+
 }

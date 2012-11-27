@@ -38,6 +38,7 @@ public class FieldOptsPanel extends JPanel implements ActionListener {
   JTextField _uniqueTokens = new JTextField("100");
   JTextField _tokenLen = new JTextField("4");
   JTextField _rawBytes = new JTextField("0");
+  JTextField _fieldType = new JTextField("");
 
   JButton _save = new JButton("Add/Save field");
   JButton _cancel = new JButton("Cancel");
@@ -57,7 +58,8 @@ public class FieldOptsPanel extends JPanel implements ActionListener {
     _properties = properties;
     _estimator = estimator;
     this.setLayout(new GridLayout(0, 2));
-    setBorder(BorderFactory.createTitledBorder(BorderFactory.createLineBorder(Color.black), "Individual Field Options (will appear in 'Fields' combo box when added)"));
+    setBorder(BorderFactory.createTitledBorder(BorderFactory.createLineBorder(Color.black),
+        "Individual Field Options (will appear in 'Fields' combo box when added)"));
 
     _comboList = new JComboBox(_properties.getFieldNames());
     _comboList.setSelectedIndex(0);
@@ -71,6 +73,7 @@ public class FieldOptsPanel extends JPanel implements ActionListener {
     Utils.setupTextField(this, new JLabel("Unique tokens in field:    ", JLabel.RIGHT), _uniqueTokens, _uniqueTokens.getText());
     Utils.setupTextField(this, new JLabel("Average token length (bytes):    ", JLabel.RIGHT), _tokenLen, _tokenLen.getText());
     Utils.setupTextField(this, new JLabel("Average text bytes ONLY if stored:    ", JLabel.RIGHT), _rawBytes, _rawBytes.getText());
+    Utils.setupTextField(this, new JLabel("Field type (optional, see dump):    ", JLabel.RIGHT), _fieldType, _fieldType.getText());
     Utils.addTwoCheckBoxes(this, _sorting, prop.is_sorting(), _string, prop.is_string());
     Utils.addTwoCheckBoxes(this, _boosting, prop.is_boosting(), _lengthNorms, prop.is_lengthNorms());
     Utils.addTwoCheckBoxes(this, _statistics, prop.is_statistics(), _phrases, prop.is_phrases());
@@ -92,17 +95,10 @@ public class FieldOptsPanel extends JPanel implements ActionListener {
 
 
   void showFieldOpts(String fieldName) {
-    FieldProperty thisOne;
-    if ("new".equals(fieldName) || "".equals(fieldName)) {
-      thisOne = new FieldProperty(fieldName);
-    } else {
-      thisOne = _properties.getFieldProperty(fieldName);
-    }
+    FieldProperty thisOne = _properties.getFieldProperty(fieldName);
+
     if (thisOne == null) {
-      JOptionPane.showMessageDialog(this,
-          "Programming error, can't find field with that name.",
-          "Programming error",
-          JOptionPane.ERROR_MESSAGE);
+      thisOne = new FieldProperty(fieldName);
     }
     _sorting.setSelected(thisOne.is_sorting());
     _string.setSelected(thisOne.is_string());
@@ -118,6 +114,7 @@ public class FieldOptsPanel extends JPanel implements ActionListener {
     _uniqueTokens.setText(Utils._decimalFormat.format(thisOne.get_uniqueVals()));
     _tokenLen.setText(Utils._decimalFormat.format(thisOne.get_tokenLen()));
     _rawBytes.setText(Utils._decimalFormat.format(thisOne.get_rawBytes()));
+    _fieldType.setText(thisOne.get_fieldType());
   }
 
   public void addToCombo(FieldProperty newProp) {
@@ -144,7 +141,7 @@ public class FieldOptsPanel extends JPanel implements ActionListener {
       if (fieldName != null) fieldName = fieldName.trim();
       if (fieldName == null || fieldName.length() == 0) {
         JOptionPane.showMessageDialog(null,
-            "Sorry, we're not going to make a field with name 'new', or an empty name too confusing",
+            "Field name may not be empty!",
             "user error",
             JOptionPane.ERROR_MESSAGE);
         return;
@@ -154,6 +151,7 @@ public class FieldOptsPanel extends JPanel implements ActionListener {
       newProp.set_uniqueVals(Utils.getLong(_uniqueTokens.getText()));
       newProp.set_tokenLen(Utils.getLong(_tokenLen.getText()));
       newProp.set_rawBytes(Utils.getLong(_rawBytes.getText()));
+      newProp.set_name((_fieldName.getText()));
       newProp.set_boosting(_boosting.isSelected());
       newProp.set_lengthNorms(_lengthNorms.isSelected());
       newProp.set_phrases(_phrases.isSelected());
@@ -163,6 +161,7 @@ public class FieldOptsPanel extends JPanel implements ActionListener {
       newProp.set_facet_enum(_facet_enum.isSelected());
       newProp.set_facet_fc(_facet_fc.isSelected());
       newProp.set_statistics(_statistics.isSelected());
+      newProp.set_fieldType((_fieldType.getText()));
       _properties.addFieldProperty(newProp);
       addToCombo(newProp);
     } else if (actionEvent.getSource() == _delete) {
