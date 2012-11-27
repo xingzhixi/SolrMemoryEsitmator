@@ -26,3 +26,11 @@ License info:
  Code is a "living bit of code" meaning it isn't necessarily reliable at this point, but
  at least it's a starting point.
  
+
+To build the project:
+
+ant jar
+
+To run the estimator:
+
+java -jar dist/estimator.jar
