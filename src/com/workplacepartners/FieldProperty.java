@@ -34,6 +34,8 @@ class FieldProperty implements Serializable {
   private long _tokenLen = 4;
   private long _rawBytes = 0;
 
+  private String _fieldType = "";
+
   //TODO: go over things again. But the issue is that you need to go over all the opts and figure out what's right.
 
   FieldProperty(String name) {
@@ -142,5 +144,13 @@ class FieldProperty implements Serializable {
 
   public void set_facet_fc(boolean _facet_fc) {
     this._facet_fc = _facet_fc;
+  }
+
+  public String get_fieldType() {
+    return _fieldType;
+  }
+
+  public void set_fieldType(String _fieldType) {
+    this._fieldType = _fieldType;
   }
 }

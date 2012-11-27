@@ -49,7 +49,7 @@ public class Utils {
   }
 
   static void setupTextField(JPanel panel, JLabel label, JTextField field, String val) {
-    label.setLabelFor(field);
+//    label.setLabelFor(field);
     field.setColumns(10);
     field.setText(val);
 
