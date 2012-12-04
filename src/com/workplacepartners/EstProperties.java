@@ -42,6 +42,7 @@ public class EstProperties implements Serializable {
   private int _avgFqSize = 16;
   private int _avgQuerySize = 128;
   private int _maxWindowSize = 40;
+  private int _unFlushed = 100;
 
   public Object[] getFieldNames() {
     List<String> names = new ArrayList<String>();
@@ -147,5 +148,13 @@ public class EstProperties implements Serializable {
 
   public Map<String, CacheProperty> get_cacheProperties() {
     return _cacheProperties;
+  }
+
+  public int get_unFlushed() {
+    return _unFlushed;
+  }
+
+  public void set_unFlushed(int _unFlushed) {
+    this._unFlushed = _unFlushed;
   }
 }

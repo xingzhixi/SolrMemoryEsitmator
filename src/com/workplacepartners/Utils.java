@@ -45,14 +45,16 @@ public class Utils {
     return _below;
   }
 
-  static void setupTextField(JPanel panel, JLabel label, JTextField field, long val) {
-    setupTextField(panel, label, field, _decimalFormat.format(val));
+  static void setupTextField(JPanel panel, JLabel label, JTextField field, long val, String toolTip) {
+    setupTextField(panel, label, field, _decimalFormat.format(val), toolTip);
   }
 
-  static void setupTextField(JPanel panel, JLabel label, JTextField field, String val) {
+  static void setupTextField(JPanel panel, JLabel label, JTextField field, String val, String toolTip) {
 //    label.setLabelFor(field);
     field.setColumns(10);
     field.setText(val);
+    field.setToolTipText(toolTip);
+
 
     panel.add(label);
     panel.add(field);
@@ -68,16 +70,20 @@ public class Utils {
   }
 
   static boolean validateLong(String num, String fieldName, long max) {
+    boolean ret = true;
     try {
-      Long.parseLong(num.trim().replaceAll("[,\\.]", ""));
+      Long val = Long.parseLong(num.trim().replaceAll("[,\\.]", ""));
+      if (val < 0) ret = false;
     } catch (Exception e) {
+      ret = false;
+    }
+    if (! ret) {
       JOptionPane.showMessageDialog(null,
           String.format("Field entry %s must be a valid number between 0 and %s inclusive  (commas or periods allowed).",
               fieldName, Utils._decimalFormat.format(max)),
           "user error",
           JOptionPane.ERROR_MESSAGE);
-      return false;
     }
-    return true;
+    return ret;
   }
 }

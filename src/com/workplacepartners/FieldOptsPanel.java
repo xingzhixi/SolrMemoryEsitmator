@@ -52,6 +52,8 @@ public class FieldOptsPanel extends JPanel implements ActionListener {
   JPanel _buttonsL = new JPanel();
   JPanel _buttonsR = new JPanel();
 
+  JPanel _radios = new JPanel();
+
   FieldOptsPanel(EstProperties properties, Estimator estimator) {
     //Create the check boxes.
     super();
@@ -69,15 +71,29 @@ public class FieldOptsPanel extends JPanel implements ActionListener {
     add(_comboList);
     _invisible.setVisible(false);
     FieldProperty prop = new FieldProperty("new"); // Just to get defaults
-    Utils.setupTextField(this, new JLabel("name:    ", JLabel.RIGHT), _fieldName, _fieldName.getText());
-    Utils.setupTextField(this, new JLabel("Unique tokens in field:    ", JLabel.RIGHT), _uniqueTokens, _uniqueTokens.getText());
-    Utils.setupTextField(this, new JLabel("Average token length (bytes):    ", JLabel.RIGHT), _tokenLen, _tokenLen.getText());
-    Utils.setupTextField(this, new JLabel("Average text bytes ONLY if stored:    ", JLabel.RIGHT), _rawBytes, _rawBytes.getText());
-    Utils.setupTextField(this, new JLabel("Field type (optional, see dump):    ", JLabel.RIGHT), _fieldType, _fieldType.getText());
+    Utils.setupTextField(this, new JLabel("name:    ", JLabel.RIGHT),
+        _fieldName, _fieldName.getText(),
+        "Enter a name in this field to define a new field.");
+    Utils.setupTextField(this, new JLabel("Unique tokens in field:    ", JLabel.RIGHT),
+        _uniqueTokens, _uniqueTokens.getText(),
+        "Enter the number of unique tokens in the entire corpus that will be in this field");
+    Utils.setupTextField(this, new JLabel("Average token length (bytes):    ", JLabel.RIGHT),
+        _tokenLen, _tokenLen.getText(),
+        "Enter the average token length, e.g. 4 for ints, 8 for longs, word length for text)");
+    Utils.setupTextField(this, new JLabel("Average text bytes ONLY if stored:    ", JLabel.RIGHT),
+        _rawBytes, _rawBytes.getText(),
+        "Enter the input field averages size if stored. Used for computing document cache size");
+    Utils.setupTextField(this, new JLabel("Field type (optional):    ", JLabel.RIGHT),
+        _fieldType, _fieldType.getText(),
+        "Informational only for including in the dump file.");
     Utils.addTwoCheckBoxes(this, _sorting, prop.is_sorting(), _string, prop.is_string());
     Utils.addTwoCheckBoxes(this, _boosting, prop.is_boosting(), _lengthNorms, prop.is_lengthNorms());
     Utils.addTwoCheckBoxes(this, _statistics, prop.is_statistics(), _phrases, prop.is_phrases());
     Utils.addTwoCheckBoxes(this, _faceting, prop.is_faceting(), _invisible, false);
+    // TODO: figure out how to do this. _radios.setLayout(new GroupLayout());
+    _radios.add(_facet_enum);
+    _radios.add(_facet_fc);
+    //this.add(_radios);
     Utils.addTwoCheckBoxes(this, _facet_enum, prop.is_facet_enum(), _facet_fc, prop.is_facet_fc());
 
     _buttonsL.setLayout(new GridLayout(0, 2));
