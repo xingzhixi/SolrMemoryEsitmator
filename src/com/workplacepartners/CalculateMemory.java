@@ -48,7 +48,7 @@ public class CalculateMemory {
       dumpNum("      Document Cache Size: ", estProps.get_documentCacheSize());
       dumpNum("  Query Result Cache Size: ", estProps.get_queryResultCacheSize());
       dumpNum("          User Cache Size: ", estProps.get_userCacheSize());
-      dumpNum("Average Filter Query Size: ", estProps.get_filterCacheSize());
+      dumpNum("Average Filter Query Size: ", estProps.get_avgFqSize());
       dumpNum("       Average Query Size: ", estProps.get_avgQuerySize());
       dumpNum("          Max Window Size: ", estProps.get_maxWindowSize());
       _sb.append("\n");
@@ -121,53 +121,59 @@ public class CalculateMemory {
       _sb.append("\n");
       _sb.append("-------------Dumping Caches-------------------------------------");
       _sb.append("\n");
-      Map<String, CacheProperty> cacheProps = estProps.get_cacheProperties();
 
       // Filter cache
       _sb.append("\n");
       _sb.append("Filter cache:");
       _sb.append("\n");
-      CacheProperty cp = cacheProps.get(FixedOptsPanel.CACHE_FILTER);
-      total += cp.get_size() * estProps.get_avgFqSize();
+
+      // First, calculate key size.
+      int size = estProps.get_filterCacheSize();
+      int qSize = estProps.get_avgFqSize();
+      total += size * qSize;
       dumpNum(String.format("  Aggregate size of keys (%s * %s): ",
-          Utils._decimalFormat.format(cp.get_size()), estProps.get_avgFqSize()), cp.get_size() * estProps.get_avgFqSize());
-      total += cp.get_size() * maxDocs / 8;
+          Utils._decimalFormat.format(size), qSize), size * qSize);
+
+      long tmp = size * maxDocs / 8;
+      total += tmp;
       dumpNum(String.format("  Aggregate value for keys (%s * %s) / 8: ",
-          Utils._decimalFormat.format(cp.get_size()), Utils._decimalFormat.format(maxDocs)), cp.get_size() * maxDocs / 8);
+          Utils._decimalFormat.format(size), Utils._decimalFormat.format(maxDocs)), tmp);
 
 
       // QueryResultsCache
       _sb.append("\n");
       _sb.append("Query Result Cache:");
       _sb.append("\n");
-      cp = cacheProps.get(FixedOptsPanel.CACHE_QUERY_RESULT);
-      total += cp.get_size() * estProps.get_avgQuerySize();
+      size = estProps.get_queryResultCacheSize();
+      qSize = estProps.get_avgQuerySize();
+      total += size * qSize;
       dumpNum(String.format("  Aggregate size of keys (%s * %s): ",
-          Utils._decimalFormat.format(cp.get_size()), Utils._decimalFormat.format(estProps.get_avgQuerySize())),
-          cp.get_size() * estProps.get_avgQuerySize());
-      total += cp.get_size() * estProps.get_maxWindowSize();
+          Utils._decimalFormat.format(size), Utils._decimalFormat.format(qSize)),
+          size * qSize);
+      total += size * estProps.get_maxWindowSize();
       dumpNum(String.format("  Aggregate size of values (%s * %s): ",
-          Utils._decimalFormat.format(cp.get_size()), Utils._decimalFormat.format(estProps.get_maxWindowSize())),
-          cp.get_size() * estProps.get_maxWindowSize());
+          Utils._decimalFormat.format(size), Utils._decimalFormat.format(estProps.get_maxWindowSize())),
+          size * estProps.get_maxWindowSize());
 
 
       // Document cache
       _sb.append("\n");
       _sb.append("Document cache:");
       _sb.append("\n");
-      cp = cacheProps.get(FixedOptsPanel.CACHE_DOCUMENT);
-      total += cp.get_size() * maxBytesPerDoc;
+      size = estProps.get_documentCacheSize();
+
+      total += size * maxBytesPerDoc;
       dumpNum(String.format("  Aggregate size of docs  %s * %s: ",
-          Utils._decimalFormat.format(cp.get_size()), Utils._decimalFormat.format(maxBytesPerDoc)),
-          cp.get_size() * maxBytesPerDoc);
+          Utils._decimalFormat.format(size), Utils._decimalFormat.format(maxBytesPerDoc)),
+          size * maxBytesPerDoc);
 
       // User cache
       _sb.append("\n");
       _sb.append("User cache:");
       _sb.append("\n");
-      cp = cacheProps.get(FixedOptsPanel.CACHE_USER);
-      total += cp.get_size();
-      dumpNum("  User entered: ", cp.get_size());
+      size = estProps.get_userCacheSize();
+      total += size;
+      dumpNum("  User entered: ", size);
 
       //TODO: tlog
       // From Yonik, each doc is essentially 2 longs + average size of <uniqueKey>. It's cleared on softcommit.
@@ -244,7 +250,7 @@ public class CalculateMemory {
   }
 
   static void dumpBool(String tag, boolean val) throws IOException {
-    _sb.append(tag).append((val) ? "true" : "false");
+    _sb.append(tag).append((val) ? "true" : "false")  ;
     _sb.append("\n");
   }
 

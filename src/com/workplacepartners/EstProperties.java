@@ -31,7 +31,6 @@ public class EstProperties implements Serializable {
 
   private Map<String, FieldProperty> _fieldProperties = new TreeMap<String, FieldProperty>();
 
-  private Map<String, CacheProperty> _cacheProperties = new TreeMap<String, CacheProperty>();
 
   private long _numDocs = 1000000;
   private int _delPercent = 0;
@@ -63,10 +62,6 @@ public class EstProperties implements Serializable {
 
   public void removeField(String name) {
     get_fieldProperties().remove(name);
-  }
-
-  public void addCacheProperty(CacheProperty property) {
-    get_cacheProperties().put(property.get_name(), property);
   }
 
   public long get_numDocs() {
@@ -144,10 +139,6 @@ public class EstProperties implements Serializable {
 
   public Map<String, FieldProperty> get_fieldProperties() {
     return _fieldProperties;
-  }
-
-  public Map<String, CacheProperty> get_cacheProperties() {
-    return _cacheProperties;
   }
 
   public int get_unFlushed() {

@@ -85,10 +85,6 @@ public class FixedOptsPanel extends JPanel {
         "Enter the maximum number of documents you expect to index without performing a commit (soft or hard). " +
             "Used to calculate the in-memory portion of the transaction log.");
 
-    _estProps.addCacheProperty(new CacheProperty(CACHE_FILTER, (int) Utils.getLong(_filterCacheSize.getText())));
-    _estProps.addCacheProperty(new CacheProperty(CACHE_DOCUMENT, (int) Utils.getLong(_documentCacheSize.getText())));
-    _estProps.addCacheProperty(new CacheProperty(CACHE_QUERY_RESULT, (int) Utils.getLong(_queryResultSize.getText())));
-    _estProps.addCacheProperty(new CacheProperty(CACHE_USER, (int) Utils.getLong(_userCacheSize.getText())));
     setVisible(true);
   }
 
