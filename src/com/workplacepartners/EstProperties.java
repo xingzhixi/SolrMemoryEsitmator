@@ -53,7 +53,10 @@ public class EstProperties implements Serializable {
   }
 
   public FieldProperty getFieldProperty(String name) {
-    return get_fieldProperties().get(name);
+    Map<String, FieldProperty> ret = get_fieldProperties();
+    if (ret != null) return ret.get(name);
+    return null;
+
   }
 
   public void addFieldProperty(FieldProperty property) {

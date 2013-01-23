@@ -23,6 +23,7 @@ import java.awt.event.ActionListener;
 
 public class FieldOptsPanel extends JPanel implements ActionListener {
 
+  JCheckBox _searching = new JCheckBox("Use for seaching?");
   JCheckBox _sorting = new JCheckBox("Use for sorting?");
   JCheckBox _string = new JCheckBox("String field?");
   JCheckBox _boosting = new JCheckBox("Boosting?");
@@ -34,6 +35,7 @@ public class FieldOptsPanel extends JPanel implements ActionListener {
   JCheckBox _facet_fc = new JCheckBox("Facet method FC?");
   JCheckBox _invisible = new JCheckBox(""); // because of stupid grid layout. You probably should have used a builder
 
+  JTextField _avgTokensPerDoc = new JTextField("1,000");
   JTextField _fieldName = new JTextField("");
   JTextField _uniqueTokens = new JTextField("100");
   JTextField _tokenLen = new JTextField("4");
@@ -61,19 +63,22 @@ public class FieldOptsPanel extends JPanel implements ActionListener {
     _estimator = estimator;
     this.setLayout(new GridLayout(0, 2));
     setBorder(BorderFactory.createTitledBorder(BorderFactory.createLineBorder(Color.black),
-        "Individual Field Options (will appear in 'Fields' combo box when added)"));
+        "Individual Field Options (will appear in 'Fields' combo box when added)."));
 
     _comboList = new JComboBox(_properties.getFieldNames());
     _comboList.setSelectedIndex(0);
     _comboList.addActionListener(this);
 
-    add(new JLabel("Fields: ", JLabel.RIGHT));
+    add(new JLabel("Fields:   ", JLabel.RIGHT));
     add(_comboList);
     _invisible.setVisible(false);
     FieldProperty prop = new FieldProperty("new"); // Just to get defaults
     Utils.setupTextField(this, new JLabel("name:    ", JLabel.RIGHT),
         _fieldName, _fieldName.getText(),
         "Enter a name in this field to define a new field.");
+    Utils.setupTextField(this, new JLabel("Tokens/doc:    ", JLabel.RIGHT),
+        _avgTokensPerDoc, _avgTokensPerDoc.getText(),
+        "Enter the average number of tokens per document");
     Utils.setupTextField(this, new JLabel("Unique tokens in field:    ", JLabel.RIGHT),
         _uniqueTokens, _uniqueTokens.getText(),
         "Enter the number of unique tokens in the entire corpus that will be in this field");
@@ -86,10 +91,11 @@ public class FieldOptsPanel extends JPanel implements ActionListener {
     Utils.setupTextField(this, new JLabel("Field type (optional):    ", JLabel.RIGHT),
         _fieldType, _fieldType.getText(),
         "Informational only for including in the dump file.");
-    Utils.addTwoCheckBoxes(this, _sorting, prop.is_sorting(), _string, prop.is_string());
-    Utils.addTwoCheckBoxes(this, _boosting, prop.is_boosting(), _lengthNorms, prop.is_lengthNorms());
-    Utils.addTwoCheckBoxes(this, _statistics, prop.is_statistics(), _phrases, prop.is_phrases());
-    Utils.addTwoCheckBoxes(this, _faceting, prop.is_faceting(), _invisible, false);
+    Utils.addTwoCheckBoxes(this, _searching, prop.is_searching(), _sorting, prop.is_sorting());
+    Utils.addTwoCheckBoxes(this, _string, prop.is_string(), _boosting, prop.is_boosting());
+    Utils.addTwoCheckBoxes(this, _lengthNorms, prop.is_lengthNorms(), _statistics, prop.is_statistics());
+    Utils.addTwoCheckBoxes(this,  _phrases, prop.is_phrases(), _faceting, prop.is_faceting());
+    //Utils.addTwoCheckBoxes(this, _invisible, false);
     // TODO: figure out how to do this. _radios.setLayout(new GroupLayout());
     _radios.add(_facet_enum);
     _radios.add(_facet_fc);
@@ -105,8 +111,10 @@ public class FieldOptsPanel extends JPanel implements ActionListener {
     _buttonsL.add(_save);
     _buttonsL.add(_cancel);
     _buttonsR.add(_delete);
+
     this.add(_buttonsL, Utils.getBelow());
     this.add(_buttonsR, Utils.getBelow());
+    this.add(new JLabel("You must click the Add/Save button to affect calculations!!!"), Utils.getBelow());
   }
 
 
@@ -116,6 +124,7 @@ public class FieldOptsPanel extends JPanel implements ActionListener {
     if (thisOne == null) {
       thisOne = new FieldProperty(fieldName);
     }
+    _searching.setSelected(thisOne.is_searching());
     _sorting.setSelected(thisOne.is_sorting());
     _string.setSelected(thisOne.is_string());
     _faceting.setSelected(thisOne.is_faceting());
@@ -127,10 +136,12 @@ public class FieldOptsPanel extends JPanel implements ActionListener {
     _phrases.setSelected(thisOne.is_phrases());
     _fieldName.setText(thisOne.get_name());
 
+
     _uniqueTokens.setText(Utils._decimalFormat.format(thisOne.get_uniqueVals()));
     _tokenLen.setText(Utils._decimalFormat.format(thisOne.get_tokenLen()));
     _rawBytes.setText(Utils._decimalFormat.format(thisOne.get_rawBytes()));
     _fieldType.setText(thisOne.get_fieldType());
+    _avgTokensPerDoc.setText(Utils._decimalFormat.format(thisOne.get_avgTokensPerDoc()));
   }
 
   public void addToCombo(FieldProperty newProp) {
@@ -167,11 +178,13 @@ public class FieldOptsPanel extends JPanel implements ActionListener {
       newProp.set_uniqueVals(Utils.getLong(_uniqueTokens.getText()));
       newProp.set_tokenLen(Utils.getLong(_tokenLen.getText()));
       newProp.set_rawBytes(Utils.getLong(_rawBytes.getText()));
+      newProp.set_avgTokensPerDoc(Utils.getLong(_avgTokensPerDoc.getText()));
       newProp.set_name((_fieldName.getText()));
       newProp.set_boosting(_boosting.isSelected());
       newProp.set_lengthNorms(_lengthNorms.isSelected());
       newProp.set_phrases(_phrases.isSelected());
       newProp.set_sorting(_sorting.isSelected());
+      newProp.set_searching(_searching.isSelected());
       newProp.set_string((_string.isSelected()));
       newProp.set_faceting(_faceting.isSelected());
       newProp.set_facet_enum(_facet_enum.isSelected());

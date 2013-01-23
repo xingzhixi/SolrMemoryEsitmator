@@ -20,6 +20,7 @@ import java.io.Serializable;
 
 class FieldProperty implements Serializable {
   private String _name;
+  private boolean _searching = true;
   private boolean _sorting = false;
   private boolean _string = false;
   private boolean _faceting = false;
@@ -33,6 +34,7 @@ class FieldProperty implements Serializable {
   private long _uniqueVals = 100;
   private long _tokenLen = 4;
   private long _rawBytes = 0;
+  private long _avgTokensPerDoc = 1000;
 
   private String _fieldType = "";
 
@@ -152,5 +154,21 @@ class FieldProperty implements Serializable {
 
   public void set_fieldType(String _fieldType) {
     this._fieldType = _fieldType;
+  }
+
+  public boolean is_searching() {
+    return _searching;
+  }
+
+  public void set_searching(boolean _searching) {
+    this._searching = _searching;
+  }
+
+  public long get_avgTokensPerDoc() {
+    return _avgTokensPerDoc;
+  }
+
+  public void set_avgTokensPerDoc(long _avgTokensPerDoc) {
+    this._avgTokensPerDoc = _avgTokensPerDoc;
   }
 }
